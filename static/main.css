@@ -1,0 +1,810 @@
+/* These are CSS variables. They allow you to change the theme of the chatbot by replacing the values. Read more about them here: https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties */
+:root {
+  --default-light: #FFFFFF;
+  --default-dark: #000000;
+  --accent-bright: #C4FF47;
+  --accent-very-light: #A2A2A2;
+  --accent-light: #8D8D8D;
+  --accent-medium: #4200FF;
+  --accent-bold: #FF0000;
+  --button-lock: #ADACAC;
+  --button-hover: #E1D6FF;
+  --button-light: #F0F0F0;
+  --button-light-accent: rgba(0, 0, 0, 0.21);
+  --button-warning: #FFE9E9;
+  --border-radius: 7px;
+  --toggle-background: #D9D9D9;
+  --waiting-animation: #E2D7FF;
+  --placeholder-text-accents: #9E9C9C;
+  --default-text-font-family: "Lato", sans-serif;
+  --logo-text-font-family: "Josefin Sans", sans-serif;
+  --trip-text-font-family: "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Background images  */
+
+body.full-layout {
+  background: linear-gradient(0deg, rgba(60, 60, 60, 0.55), rgba(60, 60, 60, 0.55)), url('alice-triquet-HeEJU3nrg_0-unsplash.png'), #000000;
+  background-size: cover;
+  background-position: center;
+}
+
+body.plan {
+  background: linear-gradient(0deg, rgba(60, 60, 60, 0.75), rgba(60, 60, 60, 0.75)), url('rohit-tandon-9wg5jCEPBsw-unsplash.png'), #000000;
+  background-size: cover;
+  background-position: center;
+}
+
+body.create {
+  background: linear-gradient(0deg, rgba(60, 60, 60, 0.29), rgba(60, 60, 60, 0.29)), url('AmyMartin_GC_from_above.png'), #000000;
+  background-size: cover;
+  background-position: center;
+}
+
+/* End background images */
+
+body,
+input,
+button,
+select,
+a {
+  font-size: 1rem;
+  color: var(--default-dark);
+  font-family: var(--default-text-font-family);
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  background-color: var(--default-light);
+  font-weight: 900;
+  background-color: none;
+}
+
+button:hover {
+  background-color: var(--accent-medium);
+  color: var(--default-light);
+}
+
+.dark-bkgd,
+.plan-half-dark-bkgd,
+.create-half-dark-bkgd,
+.my-trips-dark-bkgd,
+.my-trips-dark-bkgd a,
+.dark-bkgd a,
+.plan-half-dark-bkgd a,
+.create-half-dark-bkgd a {
+  color: var(--default-light);
+}
+
+h1 {
+  font-size: 1.875rem;
+  font-family: var(--logo-text-font-family);
+  color: var(--default-dark);
+  background-color: var(--accent-bright);
+  padding: 15px 10px 10px 10px;
+  border-radius: var(--border-radius);
+  line-height: 0.7;
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin-left: -2px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.link-underline {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-underline:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--accent-bright);
+}
+
+.btn {
+  padding: 10px 40px 10px 45px;
+  background-color: var(--accent-medium);
+  color: var(--default-light);
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 900;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: var(--default-dark);
+}
+
+.my-trip-btn {
+  font-size: 1.25rem;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+header .header-content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+}
+
+.nav-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.account {
+  padding: 5px 5px 7px 5px;
+  background-color: var(--accent-bright);
+  border-radius: 50%;
+  color: var(--default-dark);
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+}
+
+#username,
+#password {
+  font-style: italic;
+}
+
+.homepage-content-wrapper,
+.main-content-wrapper {
+  width: 80%;
+}
+
+.create-main-content-wrapper {
+  margin-top: 50px;
+}
+
+.tag-line {
+  margin-bottom: 30px;
+}
+
+#trip-date {
+  margin-bottom: 30px;
+}
+
+.create-trip-edit-buttons {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+
+.icons {
+  margin-right: 10px;
+}
+
+#edit-trip,
+#export-trip,
+#delete-trip {
+  padding: 20px;
+  background-color: var(--default-light);
+  color: var(--default-dark);
+  border-radius: var(--border-radius);
+  margin: 20px 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+#edit-trip:hover,
+#export-trip:hover,
+#delete-trip:hover,
+#delete-trip:hover>button {
+  background-color: var(--accent-medium);
+  color: var(--default-light);
+}
+
+aside {
+  display: flex;
+  justify-content: center;
+}
+
+.form-content-wrapper,
+.trip-content-wrapper {
+  background-color: var(--default-light);
+  color: var(--default-dark);
+  border-radius: 20px;
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.plan-trip-form {
+  display: flex;
+  flex-flow: row wrap;
+  column-gap: 10px;
+}
+
+.legend-span {
+  color: var(--accent-very-light);
+}
+
+.location,
+.dates-wrapper {
+  width: 100%;
+}
+
+.location,
+.dates-wrapper,
+fieldset,
+.bottom-section,
+.trip-name {
+  margin: 25px 0 25px 0;
+}
+
+#location-search {
+  width: 100%;
+  padding: 10px 0 10px 20px;
+  background-color: var(--default-light);
+}
+
+.location .form-label {
+  display: block;
+  margin-bottom: 20px;
+}
+
+fieldset {
+  width: 100%;
+  border: none;
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+  gap: 10px;
+}
+
+fieldset legend {
+  margin-bottom: 20px;
+}
+
+label {
+  width: 100%;
+}
+
+fieldset label {
+  padding: 20px 10px 20px 0;
+  text-align: center;
+  width: 100%;
+  background-color: var(--button-light);
+  border-radius: var(--border-radius);
+  border-bottom: 4px solid var(--button-light-accent);
+}
+
+fieldset label:hover {
+  color: var(--accent-medium);
+  background-color: var(--button-hover);
+  border-bottom: 4px solid var(--accent-medium);
+}
+
+input {
+  margin-top: 10px;
+  padding: 10px 20px;
+  width: 100%;
+  border: none;
+  background-color: var(--default-light);
+  border-radius: var(--border-radius);
+  border-bottom: 4px solid var(--button-light-accent);
+}
+
+fieldset input {
+  margin-top: 10px;
+  padding: 10px 20px;
+  width: 0;
+}
+
+.plan-trip-form .btn {
+  color: var(--default-light);
+  width: 100%;
+  border: none;
+}
+
+input[type=checkbox] {
+  opacity: 0;
+}
+
+/* Sign in form styles */
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-top: 20px;
+  color: var(--default-dark);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--accent-light);
+  background-color: var(--button-light);
+  color: var(--default-dark);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-medium);
+}
+
+.auth-form-content-wrapper {
+  background-color: var(--default-light);
+  color: var(--default-dark);
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  margin-bottom: 30px;
+}
+
+/* End sign in form styles */
+
+/* Account styles */
+
+.link-underline:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--accent-bright);
+}
+
+.account-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.account-dropdown:hover .dropdown-content {
+  display: block;
+  border-radius: var(--border-radius);
+}
+
+.account-dropdown:hover .account {
+  color: var(--default-dark);
+  background-color: var(--default-light);
+}
+
+.account {
+  padding: 5px 10px;
+  background-color: var(--accent-bright);
+  border-radius: 50%;
+  color: var(--default-dark);
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  color: var(--default-dark);
+  background-color: var(--accent-bright);
+  border-radius: var(--border-radius);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: var(--default-dark);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  color: var(--default-dark);
+  background-color: var(--default-light);
+  border-radius: var(--border-radius);
+}
+
+/* End account styles */
+
+/* Saved trip page styles */
+
+.my-trip-panel {
+  background-color: var(--default-light);
+  color: var(--default-dark);
+  border-radius: 20px;
+  width: 100%;
+  padding: 20px;
+  margin: 30px 0;
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.trip-item {
+  display: flex;
+  align-items: center;
+  border-radius: var(--border-radius);
+  /* overflow: hidden; */
+}
+
+.trip-image {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+}
+
+.trip-details {
+  padding: 20px;
+}
+
+.trip-details h3 {
+  margin: 0 0 5px 0;
+}
+
+.trip-details p {
+  margin: 0 0 10px 0;
+}
+
+.secondary-link-underline {
+  color: var(--default-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.secondary-link-underline:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--accent-medium);
+  cursor: pointer;
+}
+
+/* End saved trip page styles */
+
+@media only screen and (min-width: 768px) {
+  .nav-wrapper {
+    gap: 20px;
+  }
+
+  h2 {
+    font-size: 3rem;
+  }
+
+  .form-content-wrapper,
+  .trip-content-wrapper {
+    padding: 50px;
+  }
+
+  fieldset {
+    justify-content: space-between;
+  }
+
+  fieldset label {
+    width: 45%;
+  }
+
+  .form-label {
+    width: 100%;
+  }
+
+  .dates-wrapper .calendar {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  #start,
+  #end {
+    width: 45%;
+    cursor: pointer;
+  }
+
+  .bottom-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  #trip-name {
+    width: 90%;
+  }
+
+  .trip-name {
+    margin: 0;
+  }
+
+  .plan-trip-form .btn {
+    width: 50%;
+  }
+
+  .my-trip-btn {
+    font-size: 1.5rem;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+
+  .split-layout {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .homepage-content-wrapper {
+    width: 79%;
+  }
+
+  .plan-half-dark-bkgd {
+    width: 50%;
+  }
+
+  .create-half-dark-bkgd,
+  .my-trips-dark-bkgd {
+    width: 70%;
+  }
+
+  .create-main-content-wrapper h2 {
+    margin-top: 10px;
+  }
+
+  .location,
+  .dates-wrapper,
+  fieldset,
+  .bottom-section,
+  .trip-name {
+    margin: initial;
+  }
+
+  .create-trip-edit-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  #edit-trip,
+  #export-trip,
+  #delete-trip {
+    width: 30%;
+  }
+
+  aside {
+    width: 70%;
+    justify-content: flex-end;
+  }
+
+  h2 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+    margin-left: -5px;
+  }
+
+  .trip-content-wrapper h2 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+  }
+
+  .homepage-h2 {
+    font-size: 5rem;
+    margin-bottom: 30px;
+    margin-left: -5px;
+  }
+
+  .form-content-wrapper,
+  .trip-content-wrapper {
+    border-radius: 30px 0 0 30px;
+    margin-bottom: 0;
+    padding: 60px;
+    width: 80%;
+  }
+
+  .trip-content-wrapper {
+    overflow: scroll;
+    scrollbar-color: var(--accent-medium) var(--accent-medium);
+    scrollbar-width: thin;
+  }
+
+  .plan-trip-form {
+    align-content: space-between;
+    height: 100%;
+  }
+
+  .location,
+  .dates,
+  fieldset,
+  .trip-name {
+    margin-bottom: 0px;
+  }
+
+  .dates,
+  .trip-name {
+    width: 50%;
+  }
+
+  #start,
+  #end {
+    width: 50%;
+  }
+
+  fieldset {
+    width: 100%;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row wrap;
+  }
+
+  fieldset label {
+    width: 23%;
+    padding: 10px 10px 15px 10px;
+  }
+
+  input {
+    margin-top: 10px;
+    padding: 10px 20px;
+    width: 90%;
+  }
+
+  .plan-trip-form .btn {
+    color: var(--default-light);
+  }
+
+  /* My Trips Page Styles */
+  /* If adding more info to my-trips, this is the width to adjust */
+
+  .my-trip-panel {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    border-radius: 30px 0 0 30px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow: scroll;
+    scrollbar-color: var(--accent-medium) var(--accent-medium);
+    scrollbar-width: thin;
+    margin: 0;
+  }
+
+}
+
+/* Checkbox styles */
+
+.custom-checkbox input[type="checkbox"]:checked+.checkbox-label {
+  color: var(--accent-medium);
+  font-weight: 700;
+}
+
+.custom-checkbox {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: inline-block;
+}
+
+.visually-hidden {
+  position: absolute;
+  clip: rect(0 0 0 0);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+}
+
+/* End checkbox styles */
+
+/* display/hide overlay for loading state */
+
+.drawer {
+  position: fixed;
+  top: 0;
+  /* Initially hide the drawer */
+  right: -100%;
+  width: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--default-light);
+  padding: 20px;
+  transition: right 0.3s ease;
+  margin-bottom: 0;
+  padding: 60px;
+}
+
+.drawer.open {
+  right: 0;
+  /* Slide the drawer in */
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.overlay.show {
+  display: block;
+}
+
+
+.loading-content-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row wrap;
+  width: 50%;
+  width: 100%;
+  height: 100%;
+}
+
+.loading-content {
+  width: 100%;
+}
+
+.loading-text {
+  font-size: 2rem;
+}
+
+/* Loading animation */
+
+.loader {
+  width: 120px;
+  width: 100%;
+  height: 10px;
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, #0000, var(--accent-medium)) left -50px top 0/50px 20px no-repeat var(--waiting-animation);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loader {
+    animation: loader 1.5s infinite linear;
+  }
+}
+
+@keyframes loader {
+  100% {
+    background-position: right -50px top 0
+  }
+}
+
+/* End loading animation */
+
+@media only screen and (min-width: 1200px) {
+  .drawer {
+    border-radius: 30px 0 0 30px;
+    width: 50%;
+  }
+
+  .loading-content-wrapper {
+    width: 50%;
+  }
+}

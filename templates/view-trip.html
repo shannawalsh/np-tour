@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>View Trip | Nature Nook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="split-layout create">
+  <div class="create-half-dark-bkgd">
+    <header>
+      <div class="header-content-wrapper">
+        <a href="/">
+          <h1>Nature<br>Nook.</h1>
+        </a>
+        <div class="nav-wrapper">
+          <a href="" class="link-underline">My trips</a>
+          <p class="account">E</p>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="main-content-wrapper create-main-content-wrapper">
+
+        <a href="/"><img src="../static/img/back-arrow.png" alt="back arrow" class="icons" />Back to all
+          the trips</a>
+        <h2>{{ trip_name }}</h2>
+        <p id="location">Location: {{ location }}</p>
+        <p id="trip-date">Dates: {{ trip_start }} - {{ trip_end }}</p>
+        <p id="weather">Typical Weather: {{ typical_weather }}</p>
+        <p id="traveling-with">Companions: {{ traveling_with }}</p>
+        <p id="lodging">Lodging: {{ lodging }}</p>
+        <p id="adventure">Activities: {{ adventure }}</p>
+        <div class="create-trip-edit-buttons">
+
+          <a href="" class="view-trip-btn" id="edit-trip">
+            <img src="../static/img/pen-black.png" alt="pencil icon" class="icons" />Edit trip
+          </a>
+          <button class="view-trip-btn" onclick="downloadPDF()" id="export-trip">
+            <img src="../static/img/export-black.png" alt="file icon" class="icons" />Export trip
+          </button>
+          <form action="" method="POST" class="view-trip-btn" id="delete-trip">
+            <button type="submit">
+              <img src="../static/img/x-black.png" alt="delete icon" class="icons" />Delete trip
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  <aside>
+    <div class="trip-content-wrapper">
+      <h2>Overall itinerary</h2>
+      {% for day in itinerary %}
+      <h3>Day {{ day.day }}</h3>
+      <p>Date: {{ day.date }}</p>
+      <p>Morning: {{ day.morning }}</p>
+      <p>Afternoon: {{ day.afternoon }}</p>
+      <p>Evening: {{ day.evening }}</p>
+      {% endfor %}
+      <!-- Will be used in a future lesson -->
+      <!-- <h2>Important Things to Know</h2>
+      <p></p> -->
+    </div>
+  </aside>
+
+</body>
+
+</html>
