@@ -31,13 +31,13 @@
 
         <a href="/"><img src="../static/img/back-arrow.png" alt="back arrow" class="icons" />Back to all
           the trips</a>
-        <h2>{{ trip_name }}</h2>
-        <p id="location">Location: {{ location }}</p>
-        <p id="trip-date">Dates: {{ trip_start }} - {{ trip_end }}</p>
-        <p id="weather">Typical Weather: {{ typical_weather }}</p>
-        <p id="traveling-with">Companions: {{ traveling_with }}</p>
-        <p id="lodging">Lodging: {{ lodging }}</p>
-        <p id="adventure">Activities: {{ adventure }}</p>
+        <h2>{{ output.trip_name }}</h2>
+        <p id="location">Location: {{ output.location }}</p>
+        <p id="trip-date">Dates: {{ output.trip_start }} - {{ output.trip_end }}</p>
+        <p id="weather">Typical Weather: {{ output.typical_weather }}</p>
+        <p id="traveling-with">Companions: {{ output.traveling_with }}</p>
+        <p id="lodging">Lodging: {{ output.lodging }}</p>
+        <p id="adventure">Activities: {{ output.adventure }}</p>
         <div class="create-trip-edit-buttons">
 
           <a href="" class="view-trip-btn" id="edit-trip">
@@ -58,7 +58,7 @@
   <aside>
     <div class="trip-content-wrapper">
       <h2>Overall itinerary</h2>
-      {% for day in itinerary %}
+      {% for day in output.itinerary %}
       <h3>Day {{ day.day }}</h3>
       <p>Date: {{ day.date }}</p>
       <p>Morning: {{ day.morning }}</p>
