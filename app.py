@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import logging
 from datetime import datetime
 from langchain_openai import ChatOpenAI
@@ -11,6 +11,11 @@ import requests
 import json
 from fuzzywuzzy import fuzz, process 
 import os
+import io
+from langchain_openai import OpenAI
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 
 # Initialize the OpenAI language model
 llm = ChatOpenAI(
@@ -73,12 +78,60 @@ def view_trip():
     response = agent_executor.invoke({"input": input_data})
     
     # Invoke the NPS tool separately with **only the location**
-    park_response = nps_tool(location)
+    # park_response = nps_tool(location)
     
     log.info(response["output"])
 
     # Render the response on the view-trip.html page
     return render_template("view-trip.html", output=response["output"])
+
+# Route to create the download pdf functionality
+@app.route("/download_pdf", methods=["POST"])
+def download_pdf():
+    """Handles the PDF download of the generated trip itinerary."""
+    output = request.json
+ 
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+ 
+    elements = []
+    # Create the formatting for the PDF
+    # Formatting of the trip details - Name, Location, Dates, Typical Weather, Traveling With, Lodging, & Activities
+    elements.append(Paragraph(f"<b>Trip Name:</b> {output['trip_name']}", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Location:</b> {output['location']}", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Dates:</b> {output['trip_start']} - {output['trip_end']}", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Typical Weather:</b> {output['typical_weather']}", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Traveling With:</b> {output['traveling_with']}", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Lodging:</b> {output['lodging']}", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Activities:</b> {output['adventure']}", styles['Normal']))
+    elements.append(Spacer(1, 24))
+    # Formatting for the Itinerary
+    elements.append(Paragraph("<b>Itinerary:</b>", styles['Normal']))
+    elements.append(Spacer(1, 12))
+    for day in output['itinerary']:
+        elements.append(Paragraph(f"<b>Day {day['day']}:</b> {day['date']}", styles['Normal']))
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph(f"<b>Morning:</b> {day['morning']}", styles['Normal']))
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph(f"<b>Afternoon:</b> {day['afternoon']}", styles['Normal']))
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph(f"<b>Evening:</b> {day['evening']}", styles['Normal']))
+        elements.append(Spacer(1, 24))
+    # Formatting for the Important Things to Know
+    elements.append(Paragraph(f"<b>Important Things to Know:</b> {output['important_things_to_know']}", styles['Normal']))
+    
+    # Functions called to create the PDF
+    doc.build(elements)
+    
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name="itinerary.pdf", mimetype='application/pdf')
 
 # Define generate trip function
 def generate_trip_input(location, trip_start, trip_end, traveling_with, lodging, adventure):
