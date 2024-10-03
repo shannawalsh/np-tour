@@ -38,9 +38,13 @@
       <form id="trip-form" action="/view_trip" method="POST" onsubmit="showDrawer()" class="plan-trip-form">
         <div class="location">
           <label for="location-search" class="form-label">Where do you want to go?</label>
-          <input type="text" id="location-search" name="location-search" placeholder="Grand Canyon National Park"
-            required />
+            <select id="location-search" name="location-search">
+              {% for park in parks %}
+              <option value="{{ park.name }}">{{ park.name }}</option>
+              {% endfor %}
+            </select>
         </div>
+        
         <div class="dates-wrapper">
           <label for="start" class="form-label">Exact dates</label>
           <div class="calendar">

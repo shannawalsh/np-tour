@@ -16,6 +16,7 @@ from langchain_openai import OpenAI
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from flask_sqlalchemy import SQLAlchemy
 
 # Initialize the OpenAI language model
 llm = ChatOpenAI(
@@ -31,15 +32,52 @@ log = logging.getLogger("app")
 # Initialize the Flask application
 app = Flask(__name__)
 
+# Set up the database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nature_nook.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Create the database object
+db = SQLAlchemy(app)
+
+# Define the Park model
+class Park(db.Model):
+   id = db.Column(db.Integer, primary_key=True)
+   name = db.Column(db.String(100), unique=True, nullable=False)
+   code = db.Column(db.String(10), unique=True, nullable=False)
+
 # Define the route for the home page
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
   
-# Define the route for the plan trip page
+# Define the route for the trip planning page
 @app.route("/plan_trip", methods=["GET"])
 def plan_trip():
-  return render_template("plan-trip.html")
+   """Renders the trip planning page."""
+   parks = Park.query.all()
+   return render_template("plan-trip.html", parks=parks)
+
+# Define the function to pull the parks and add to the database
+def get_parks():
+    """Fetches the entire list of national parks from the NPS API."""
+    url = "https://developer.nps.gov/api/v1/parks"
+    params = {
+       "api_key": os.environ.get("NPS_API_KEY"),
+       "limit": 50, # Based on the API's limit - https://www.nps.gov/subjects/developer/api-documentation.htm#/parks/getPark
+       "start": 0
+   }
+    parks = []
+    while True:
+       response = requests.get(url, params=params)
+       if response.status_code == 200:
+           data = response.json()
+           parks.extend([{"name": park["fullName"], "code": park["parkCode"]} for park in data["data"]])
+           if len(data["data"]) < params["limit"]:
+               break
+           params["start"] += params["limit"]
+       else:
+           break
+    return parks
 
 # Define the route for view trip page with the generated trip itinerary
 @app.route("/view_trip", methods=["POST"])
@@ -261,7 +299,21 @@ def create_nps_tool():
         return json.dumps(combined_data, indent=4)
       	
     return search_park_and_related_data
-    
+ 
+# Create a Flask CLI command for initializing the database
+# Run "flask init-db" from the command line to initialize the database
+@app.cli.command("init-db")
+def init_db(): 
+    db.create_all()
+    parks = get_parks()
+    for park in parks:
+       existing_park = Park.query.filter_by(code=park["code"]).first()
+       if not existing_park:
+           new_park = Park(name=park["name"], code=park["code"])
+           db.session.add(new_park)
+    db.session.commit()
+    print("Database initialized!")
+     
 # Run the Flask server
 if __name__ == "__main__":
     app.run()
