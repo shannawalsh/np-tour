@@ -19,10 +19,10 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from flask_sqlalchemy import SQLAlchemy
 
+# app will run at: http://127.0.0.1:5000/
+
 # Initialize the OpenAI language model
 llm = ChatOpenAI(max_tokens = 4000, model="gpt-4o-mini", temperature=0.5)
-
-# app will run at: http://127.0.0.1:5000/
 
 # Initialize logging
 logging.basicConfig(filename="app.log", level=logging.INFO)
