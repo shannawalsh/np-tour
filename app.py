@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import logging
 from datetime import datetime
 from langchain_openai import ChatOpenAI
@@ -19,9 +20,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from flask_sqlalchemy import SQLAlchemy
 
 # Initialize the OpenAI language model
-llm = ChatOpenAI(
-  max_tokens = 4000, model="gpt-4o-mini", temperature=0.5
-)
+llm = ChatOpenAI(max_tokens = 4000, model="gpt-4o-mini", temperature=0.5)
 
 # app will run at: http://127.0.0.1:5000/
 
@@ -33,11 +32,15 @@ log = logging.getLogger("app")
 app = Flask(__name__)
 
 # Set up the database
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", 'default-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nature_nook.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Create the database object
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 # Define the Park model
 class Park(db.Model):
@@ -45,13 +48,61 @@ class Park(db.Model):
    name = db.Column(db.String(100), unique=True, nullable=False)
    code = db.Column(db.String(10), unique=True, nullable=False)
 
+# Define the User model
+class User(UserMixin, db.Model):
+   id = db.Column(db.Integer, primary_key=True)
+   username = db.Column(db.String(150), unique=True, nullable=False)
+   password = db.Column(db.String(150), nullable=False)
+
+# Define the User loader
+@login_manager.user_loader
+def load_user(user_id):
+   return User.query.get(int(user_id))
+
+# Define the route for the login page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+   if request.method == 'POST':
+       username = request.form['username']
+       password = request.form['password']
+       user = User.query.filter_by(username=username).first()
+       if user and user.password == password:
+           login_user(user)
+           return redirect(url_for('index'))
+       else:
+           flash('Login Unsuccessful. Please check username and password', 'danger')
+   return render_template('login.html')
+
+# Define the route for logging out
+@app.route('/logout')
+@login_required
+def logout():
+   logout_user()
+   return redirect(url_for('login'))
+
+# Define the route for signing up
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        new_user = User(username=username, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created!', 'success')
+        return redirect(url_for('login'))
+    return render_template('signup.html')    
+
 # Define the route for the home page
-@app.route("/", methods=["GET"])
+@app.route("/", methods=['GET'])
+@login_required
 def index():
-    return render_template("index.html")
+    """Renders the main page."""
+    return render_template("index.html", user=current_user)
   
 # Define the route for the trip planning page
-@app.route("/plan_trip", methods=["GET"])
+@app.route("/plan_trip", methods=['GET'])
+@login_required
 def plan_trip():
    """Renders the trip planning page."""
    parks = Park.query.all()
@@ -80,7 +131,8 @@ def get_parks():
     return parks
 
 # Define the route for view trip page with the generated trip itinerary
-@app.route("/view_trip", methods=["POST"])
+@app.route("/view_trip", methods=['POST'])
+@login_required
 def view_trip():
     """Handles the form submission to view the generated trip itinerary."""
     # Extract form data
@@ -124,7 +176,8 @@ def view_trip():
     return render_template("view-trip.html", output=response["output"])
 
 # Route to create the download pdf functionality
-@app.route("/download_pdf", methods=["POST"])
+@app.route("/download_pdf", methods=['POST'])
+@login_required
 def download_pdf():
     """Handles the PDF download of the generated trip itinerary."""
     output = request.json

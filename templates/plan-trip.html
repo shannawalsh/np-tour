@@ -22,7 +22,16 @@
         </a>
         <div class="nav-wrapper">
           <a href="" class="link-underline">My trips</a>
-          <p class="account">E</p>
+          <div class="account-dropdown">
+            {% if user.is_authenticated %}
+            <div class="account">{{ user.username[0].upper() if user.username else '*' }}</div>
+            {% else %}
+            <div class="account">*</div>
+            {% endif %}
+            <div class="dropdown-content">
+              <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+          </div>
         </div>
       </div>
     </header>
