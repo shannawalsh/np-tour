@@ -106,7 +106,7 @@ def index():
 def plan_trip():
    """Renders the trip planning page."""
    parks = Park.query.all()
-   return render_template("plan-trip.html", parks=parks)
+   return render_template('plan-trip.html', parks=parks, user=current_user)
 
 # Define the function to pull the parks and add to the database
 def get_parks():
@@ -173,7 +173,7 @@ def view_trip():
     log.info(response["output"])
 
     # Render the response on the view-trip.html page
-    return render_template("view-trip.html", output=response["output"])
+    return render_template("view-trip.html", output=response["output"], user=current_user)
 
 # Route to create the download pdf functionality
 @app.route("/download_pdf", methods=['POST'])
