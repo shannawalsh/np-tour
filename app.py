@@ -160,6 +160,7 @@ def get_parks():
 def view_trip():
     """Handles the form submission to view the generated trip itinerary."""
     # Extract form data
+    trip_id = request.form.get("trip_id")
     location = request.form["location-search"]
     trip_start_str = request.form["trip-start"]
     trip_end_str = request.form["trip-end"]
@@ -196,14 +197,31 @@ def view_trip():
     
     output = response["output"]
     
-    # Create a new trip
-    new_trip = Trip(user_id=current_user.id, trip_name=trip_name, location=location, trip_start=trip_start,
+    # Query the database for the existing trip for the current user or create a new one
+    existing_trip = Trip.query.get(trip_id) if trip_id else None
+ 
+    if existing_trip:
+       # Update the existing trip
+       existing_trip.location = location
+       existing_trip.trip_start = trip_start
+       existing_trip.trip_end = trip_end
+       existing_trip.traveling_with = traveling_with
+       existing_trip.lodging = lodging
+       existing_trip.adventure = adventure
+       existing_trip.typical_weather = output["typical_weather"]
+       existing_trip.itinerary = json.dumps(output["itinerary"])
+       existing_trip.important_things_to_know = output["important_things_to_know"]
+       db.session.commit()
+       trip = existing_trip
+    else:
+        # Create a new trip
+        new_trip = Trip(user_id=current_user.id, trip_name=trip_name, location=location, trip_start=trip_start,
                        trip_end=trip_end, traveling_with=traveling_with, lodging=lodging, adventure=adventure,
                        typical_weather=output["typical_weather"], itinerary=json.dumps(output["itinerary"]),
                        important_things_to_know=output["important_things_to_know"])
-    db.session.add(new_trip)
-    db.session.commit()
-    trip = new_trip
+        db.session.add(new_trip)
+        db.session.commit()
+        trip = new_trip
     
     # Invoke the NPS tool separately with **only the location**
     # park_response = nps_tool(location)
@@ -211,7 +229,7 @@ def view_trip():
     log.info(response["output"])
 
     # Render the response on the view-trip.html page
-    return render_template("view-trip.html", output=output, user=current_user)
+    return render_template("view-trip.html", output=output, user=current_user, trip_id=trip.id)
 
 # Route to pull saved trips from the db
 @app.route("/my_trips", methods=["GET"])
@@ -289,6 +307,22 @@ def download_pdf():
     
     buffer.seek(0)
     return send_file(buffer, as_attachment=True, download_name="itinerary.pdf", mimetype='application/pdf')
+
+# Route to delete trip if the belongs to the logged in user
+@app.route("/delete_trip/<int:trip_id>", methods=["POST"])
+@login_required
+def delete_trip(trip_id):
+   """Handles the deletion of a trip."""
+   trip = Trip.query.get_or_404(trip_id)
+   if trip.user_id != current_user.id:
+       flash("You do not have permission to delete this trip.", "danger")
+       return redirect(url_for('my_trips'))
+   
+   db.session.delete(trip)
+   db.session.commit()
+   flash("Trip deleted successfully.", "success")
+   log.info("Trip deleted: %s", flash)
+   return redirect(url_for('my_trips'))
 
 # Define generate trip function
 def generate_trip_input(location, trip_start, trip_end, traveling_with, lodging, adventure):
