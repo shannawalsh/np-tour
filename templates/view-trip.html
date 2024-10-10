@@ -49,7 +49,7 @@
         <p id="adventure">Activities: {{ output.adventure }}</p>
         <div class="create-trip-edit-buttons">
 
-          <a href="" class="view-trip-btn" id="edit-trip">
+          <a href="{{ url_for('plan_trip', trip_id=trip_id) }}" class="view-trip-btn" id="edit-trip">
             <img src="../static/img/pen-black.png" alt="pencil icon" class="icons" />Edit trip
           </a>
           <button class="view-trip-btn" onclick="downloadPDF()" id="export-trip">

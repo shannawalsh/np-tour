@@ -119,12 +119,18 @@ def index():
     return render_template("index.html", user=current_user)
   
 # Define the route for the trip planning page
-@app.route("/plan_trip", methods=['GET'])
+@app.route("/plan_trip", methods=['GET', 'POST'])
 @login_required
 def plan_trip():
-   """Renders the trip planning page."""
+   """Renders the trip planning page or handles trip editing."""
+   trip_id = request.args.get('trip_id')
+   trip = None
+   if trip_id:
+       trip = Trip.query.get_or_404(trip_id)
+       
    parks = Park.query.all()
-   return render_template('plan-trip.html', parks=parks, user=current_user)
+   
+   return render_template('plan-trip.html', parks=parks, user=current_user, trip=trip)
 
 # Define the function to pull the parks and add to the database
 def get_parks():

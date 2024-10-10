@@ -1,162 +1,333 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>Plan Trip | Nature Nook</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main.css') }}"
+    />
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <title>Plan Trip | Nature Nook</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
-  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
-    rel="stylesheet">
-</head>
-
-<body class="split-layout plan">
-  <div class="plan-half-dark-bkgd">
-    <header>
-      <div class="header-content-wrapper">
-        <a href="/">
-          <h1>Nature<br>Nook.</h1>
-        </a>
-        <div class="nav-wrapper">
-          <a href="{{ url_for('my_trips') }}" class="link-underline">My trips</a>
-          <div class="account-dropdown">
-            {% if user.is_authenticated %}
-            <div class="account">{{ user.username[0].upper() if user.username else '*' }}</div>
-            {% else %}
-            <div class="account">*</div>
-            {% endif %}
-            <div class="dropdown-content">
-              <a href="{{ url_for('logout') }}">Logout</a>
+  <body class="split-layout plan">
+    <div class="plan-half-dark-bkgd">
+      <header>
+        <div class="header-content-wrapper">
+          <a href="/">
+            <h1>Nature<br />Nook.</h1>
+          </a>
+          <div class="nav-wrapper">
+            <a href="{{ url_for('my_trips') }}" class="link-underline"
+              >My trips</a
+            >
+            <div class="account-dropdown">
+              {% if user.is_authenticated %}
+              <div class="account">
+                {{ user.username[0].upper() if user.username else '*' }}
+              </div>
+              {% else %}
+              <div class="account">*</div>
+              {% endif %}
+              <div class="dropdown-content">
+                <a href="{{ url_for('logout') }}">Logout</a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </header>
-    <main>
-      <div class="main-content-wrapper">
-        <h2>Your adventure<br>begins here!</h2>
-        <p class="tag-line">Fill out the form to kickstart your adventure in the national park of your choice.</p>
-      </div>
-    </main>
-  </div>
-  <aside>
-    <div class="form-content-wrapper">
-      <form id="trip-form" action="/view_trip" method="POST" onsubmit="showDrawer()" class="plan-trip-form">
-        <div class="location">
-          <label for="location-search" class="form-label">Where do you want to go?</label>
+      </header>
+      <main>
+        <div class="main-content-wrapper">
+          <h2>Your adventure<br />begins here!</h2>
+          <p class="tag-line">
+            Fill out the form to kickstart your adventure in the national park
+            of your choice.
+          </p>
+        </div>
+      </main>
+    </div>
+    <aside>
+      <div class="form-content-wrapper">
+        <form
+          id="trip-form"
+          action="{{ url_for('view_trip', trip_id=trip.id if trip else None) }}"
+          method="POST"
+          onsubmit="showDrawer()"
+          class="plan-trip-form"
+        >
+          {% if trip %}
+          <input type="hidden" name="trip_id" value="{{ trip.id }}" />
+          {% endif %}
+          <div class="location">
+            <label for="location-search" class="form-label"
+              >Where do you want to go?</label
+            >
             <select id="location-search" name="location-search">
               {% for park in parks %}
-              <option value="{{ park.name }}">{{ park.name }}</option>
+              <option value="{{ park.name }}" {% if trip and trip.location==park.name %}selected{% endif %}>{{ park.name }}</option>
               {% endfor %}
             </select>
-        </div>
-        
-        <div class="dates-wrapper">
-          <label for="start" class="form-label">Exact dates</label>
-          <div class="calendar">
-            <input type="date" id="start" name="trip-start" value="start" min="" max="" required />
-            <input type="date" id="end" name="trip-end" value="end" min="" max="" required />
           </div>
-        </div>
-        <fieldset>
-          <legend>Who are you traveling with? <span class="legend-span">(multi-select)</span></legend>
-          <label for="solo" class="custom-checkbox">
-            <input type="checkbox" id="solo" name="traveling-with" value="solo" class="visually-hidden" />
-            <span class="checkbox-label">Solo</span>
-          </label>
-          <label for="partner" class="custom-checkbox">
-            <input type="checkbox" id="partner" name="traveling-with" value="with one partner"
-              class="visually-hidden" />
-            <span class="checkbox-label">Partner</span>
-          </label>
-          <label for="group" class="custom-checkbox">
-            <input type="checkbox" id="group" name="traveling-with" value="in a group" class="visually-hidden" />
-            <span class="checkbox-label">Group</span>
-          </label>
-          <label for="kids" class="custom-checkbox">
-            <input type="checkbox" id="kids" name="traveling-with" value="with kids" class="visually-hidden" />
-            <span class="checkbox-label">Kids</span>
-          </label>
-        </fieldset>
-        <fieldset>
-          <legend>What type of lodging do you prefer? <span class="legend-span">(multi-select)</span></legend>
-          <label for="hotels" class="custom-checkbox">
-            <input type="checkbox" id="hotels" name="lodging" value="hotels" class="visually-hidden" />
-            <span class="checkbox-label">Hotels</span>
-          </label>
-          <label for="lodges" class="custom-checkbox">
-            <input type="checkbox" id="lodges" name="lodging" value="lodges" class="visually-hidden" />
-            <span class="checkbox-label">Lodges</span>
-          </label>
-          <label for="campsites" class="custom-checkbox">
-            <input type="checkbox" id="campsites" name="lodging" value="campsites" class="visually-hidden" />
-            <span class="checkbox-label">Campsites</span>
-          </label>
-          <label for="bed-breakfast" class="custom-checkbox">
-            <input type="checkbox" id="bed-breakfast" name="lodging" value="bed &amp; breakfasts"
-              class="visually-hidden" />
-            <span class="checkbox-label">B&Bs</span>
-          </label>
-        </fieldset>
-        <fieldset>
-          <legend>What type of adventure do you prefer? <span class="legend-span">(multi-select)</span></legend>
-          <label for="hiking" class="custom-checkbox">
-            <input type="checkbox" id="hiking" name="adventure" value="hike" class="visually-hidden" />
-            <span class="checkbox-label">Hiking</span>
-          </label>
-          <label for="tours" class="custom-checkbox">
-            <input type="checkbox" id="tours" name="adventure" value="go on guided tours" class="visually-hidden" />
-            <span class="checkbox-label">Tours</span>
-          </label>
-          <label for="swimming" class="custom-checkbox">
-            <input type="checkbox" id="swimming" name="adventure" value="swim" class="visually-hidden" />
-            <span class="checkbox-label">Swimming</span>
-          </label>
-          <label for="canoeing" class="custom-checkbox">
-            <input type="checkbox" id="canoeing" name="adventure" value="canoe" class="visually-hidden" />
-            <span class="checkbox-label">Canoeing</span>
-          </label>
-          <label for="rafting" class="custom-checkbox">
-            <input type="checkbox" id="rafting" name="adventure" value="raft" class="visually-hidden" />
-            <span class="checkbox-label">Rafting</span>
-          </label>
-          <label for="cycling" class="custom-checkbox">
-            <input type="checkbox" id="cycling" name="adventure" value="cycle" class="visually-hidden" />
-            <span class="checkbox-label">Cycling</span>
-          </label>
-          <label for="birding" class="custom-checkbox">
-            <input type="checkbox" id="birding" name="adventure" value="bird-watch" class="visually-hidden" />
-            <span class="checkbox-label">Birding</span>
-          </label>
-          <label for="climbing" class="custom-checkbox">
-            <input type="checkbox" id="climbing" name="adventure" value="climb" class="visually-hidden" />
-            <span class="checkbox-label">Climbing</span>
-          </label>
-        </fieldset>
-        <div class="bottom-section">
-          <div class="trip-name">
-            <label for="trip-name" class="form-label">Give your trip a unique
-              name:</label>
-            <input type="text" id="trip-name" name="trip-name" placeholder="Spring break!">
-          </div>
-          <button type="submit" class="btn">Create trip</button>
-        </div>
-      </form>
-    </div>
-  </aside>
-  <!-- Drawer for loading state -->
-  <div class="overlay" id="overlay"></div>
-  <div class="drawer loading-content-wrapper" id="drawer">
-    <div>
-      <p class="loading-content">This will take a few moments.</p>
-      <p class="loading-content loading-text">We're creating your trip plan.</p>
-      <div class="loader"></div>
-    </div>
-  </div>
-  <!-- End drawer for loading state -->
-</body>
 
+          <div class="dates-wrapper">
+            <label for="start" class="form-label">Exact dates</label>
+            <div class="calendar">
+              <input
+                type="date"
+                id="start"
+                name="trip-start"
+                value="{{ trip.trip_start if trip else '' }}"
+                min=""
+                max=""
+                required
+              />
+              <input
+                type="date"
+                id="end"
+                name="trip-end"
+                value="{{ trip.trip_end if trip else '' }}"
+                min=""
+                max=""
+                required
+              />
+            </div>
+          </div>
+          <fieldset>
+            <legend>
+              Who are you traveling with?
+              <span class="legend-span">(multi-select)</span>
+            </legend>
+            <label for="solo" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="solo"
+                name="traveling-with"
+                value="solo"
+                class="visually-hidden"
+                {% if trip and 'solo' in trip.traveling_with %}checked{% endif %}
+              />
+              <span class="checkbox-label">Solo</span>
+            </label>
+            <label for="partner" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="partner"
+                name="traveling-with"
+                value="with one partner"
+                class="visually-hidden"
+                {% if trip and 'with one partner' in trip.traveling_with %}checked{% endif %}
+              />
+              <span class="checkbox-label">Partner</span>
+            </label>
+            <label for="group" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="group"
+                name="traveling-with"
+                value="in a group"
+                class="visually-hidden"
+                {% if trip and 'in a group' in trip.traveling_with %}checked{% endif %}
+              />
+              <span class="checkbox-label">Group</span>
+            </label>
+            <label for="kids" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="kids"
+                name="traveling-with"
+                value="with kids"
+                class="visually-hidden"
+                {% if trip and 'with kids' in trip.traveling_with %}checked{% endif %}
+              />
+              <span class="checkbox-label">Kids</span>
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>
+              What type of lodging do you prefer?
+              <span class="legend-span">(multi-select)</span>
+            </legend>
+            <label for="hotels" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="hotels"
+                name="lodging"
+                value="hotels"
+                class="visually-hidden"
+                {% if trip and 'hotels' in trip.lodging %}checked{% endif %}
+              />
+              <span class="checkbox-label">Hotels</span>
+            </label>
+            <label for="lodges" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="lodges"
+                name="lodging"
+                value="lodges"
+                class="visually-hidden"
+                {% if trip and 'lodges' in trip.lodging %}checked{% endif %}
+              />
+              <span class="checkbox-label">Lodges</span>
+            </label>
+            <label for="campsites" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="campsites"
+                name="lodging"
+                value="campsites"
+                class="visually-hidden"
+                {% if trip and 'campsites' in trip.lodging %}checked{% endif %}
+              />
+              <span class="checkbox-label">Campsites</span>
+            </label>
+            <label for="bed-breakfast" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="bed-breakfast"
+                name="lodging"
+                value="bed &amp; breakfast"
+                class="visually-hidden"
+                {% if trip and 'bed &amp; breakfast' in trip.lodging %}checked{% endif %}
+              />
+              <span class="checkbox-label">B&Bs</span>
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>
+              What type of adventure do you prefer?
+              <span class="legend-span">(multi-select)</span>
+            </legend>
+            <label for="hiking" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="hiking"
+                name="adventure"
+                value="hike"
+                class="visually-hidden"
+                {% if trip and 'hike' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Hiking</span>
+            </label>
+            <label for="tours" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="tours"
+                name="adventure"
+                value="go on guided tours"
+                class="visually-hidden"
+                {% if trip and 'go on guided tours' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Tours</span>
+            </label>
+            <label for="swimming" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="swimming"
+                name="adventure"
+                value="swim"
+                class="visually-hidden"
+                {% if trip and 'swim' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Swimming</span>
+            </label>
+            <label for="canoeing" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="canoeing"
+                name="adventure"
+                value="canoe"
+                class="visually-hidden"
+                {% if trip and 'canoe' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Canoeing</span>
+            </label>
+            <label for="rafting" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="rafting"
+                name="adventure"
+                value="raft"
+                class="visually-hidden"
+                {% if trip and 'raft' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Rafting</span>
+            </label>
+            <label for="cycling" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="cycling"
+                name="adventure"
+                value="cycle"
+                class="visually-hidden"
+                {% if trip and 'cycle' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Cycling</span>
+            </label>
+            <label for="birding" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="birding"
+                name="adventure"
+                value="bird-watch"
+                class="visually-hidden"
+                {% if trip and 'bird-watch' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Birding</span>
+            </label>
+            <label for="climbing" class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="climbing"
+                name="adventure"
+                value="climb"
+                class="visually-hidden"
+                {% if trip and 'climb' in trip.adventure %}checked{% endif %}
+              />
+              <span class="checkbox-label">Climbing</span>
+            </label>
+          </fieldset>
+          <div class="bottom-section">
+            <div class="trip-name">
+              <label for="trip-name" class="form-label"
+                >Give your trip a unique name:</label
+              >
+              <input
+                type="text"
+                id="trip-name"
+                value="{{ trip.trip_name if trip else '' }}"
+                name="trip-name"
+                placeholder="Spring break!"
+              />
+            </div>
+            {% if trip %}
+            <button type="submit" class="btn">Update trip</button>
+            {% else %}
+            <button type="submit" class="btn">Create trip</button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </aside>
+    <!-- Drawer for loading state -->
+    <div class="overlay" id="overlay"></div>
+    <div class="drawer loading-content-wrapper" id="drawer">
+      <div>
+        <p class="loading-content">This will take a few moments.</p>
+        <p class="loading-content loading-text">
+          We're creating your trip plan.
+        </p>
+        <div class="loader"></div>
+      </div>
+    </div>
+    <!-- End drawer for loading state -->
+  </body>
 </html>
