@@ -59,6 +59,24 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
    return User.query.get(int(user_id))
 
+# Define the Trip model for the database
+class Trip(db.Model):
+   id = db.Column(db.Integer, primary_key=True)
+   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+   trip_name = db.Column(db.String(150), nullable=False)
+   location = db.Column(db.String(150), nullable=False)
+   trip_start = db.Column(db.Date, nullable=False)
+   trip_end = db.Column(db.Date, nullable=False)
+   traveling_with = db.Column(db.String(150), nullable=False)
+   lodging = db.Column(db.String(150), nullable=False)
+   adventure = db.Column(db.String(150), nullable=False)
+   created_at = db.Column(db.DateTime, default=datetime.utcnow)
+   typical_weather = db.Column(db.String(150), nullable=True)
+   itinerary = db.Column(db.Text, nullable=True)
+   important_things_to_know = db.Column(db.Text, nullable=True)
+ 
+   user = db.relationship('User', backref=db.backref('trips', lazy=True))
+
 # Define the route for the login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -137,11 +155,14 @@ def view_trip():
     """Handles the form submission to view the generated trip itinerary."""
     # Extract form data
     location = request.form["location-search"]
-    trip_start = request.form["trip-start"]
-    trip_end = request.form["trip-end"]
+    trip_start_str = request.form["trip-start"]
+    trip_end_str = request.form["trip-end"]
+    trip_start = datetime.strptime(trip_start_str, '%Y-%m-%d').date()
+    trip_end = datetime.strptime(trip_end_str, '%Y-%m-%d').date()
     traveling_with = ", ".join(request.form.getlist("traveling-with"))
     lodging = ", ".join(request.form.getlist("lodging"))
     adventure = ", ".join(request.form.getlist("adventure"))
+    trip_name = request.form["trip-name"]
     
     # Create the input string with the user's unique trip information
     input_data = generate_trip_input(location, trip_start, trip_end, traveling_with, lodging, adventure)
@@ -167,13 +188,52 @@ def view_trip():
     # Invoke the agent with the input data
     response = agent_executor.invoke({"input": input_data})
     
+    output = response["output"]
+    
+    # Create a new trip
+    new_trip = Trip(user_id=current_user.id, trip_name=trip_name, location=location, trip_start=trip_start,
+                       trip_end=trip_end, traveling_with=traveling_with, lodging=lodging, adventure=adventure,
+                       typical_weather=output["typical_weather"], itinerary=json.dumps(output["itinerary"]),
+                       important_things_to_know=output["important_things_to_know"])
+    db.session.add(new_trip)
+    db.session.commit()
+    trip = new_trip
+    
     # Invoke the NPS tool separately with **only the location**
     # park_response = nps_tool(location)
     
     log.info(response["output"])
 
     # Render the response on the view-trip.html page
-    return render_template("view-trip.html", output=response["output"], user=current_user)
+    return render_template("view-trip.html", output=output, user=current_user)
+
+# Route to pull saved trips from the db
+@app.route("/my_trips", methods=["GET"])
+@login_required
+def my_trips():
+   """Renders the saved trips page."""
+   trips = Trip.query.filter_by(user_id=current_user.id).all()
+   return render_template("my-trips.html", trips=trips, user=current_user)
+
+# Route to display selected trip from saved trips
+@app.route("/view_trip/<int:trip_id>", methods=["GET"])
+@login_required
+def view_saved_trip(trip_id):
+   """Renders the detailed view for a saved trip."""
+   trip = Trip.query.get_or_404(trip_id)
+   output = {
+       "trip_name": trip.trip_name,
+       "location": trip.location,
+       "trip_start": trip.trip_start,
+       "trip_end": trip.trip_end,
+       "typical_weather": trip.typical_weather,
+       "traveling_with": trip.traveling_with,
+       "lodging": trip.lodging,
+       "adventure": trip.adventure,
+       "itinerary": json.loads(trip.itinerary) if trip.itinerary else [],
+       "important_things_to_know": trip.important_things_to_know
+   }
+   return render_template("view-trip.html", output=output, user=current_user, trip_id=trip.id)
 
 # Route to create the download pdf functionality
 @app.route("/download_pdf", methods=['POST'])

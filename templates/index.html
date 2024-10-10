@@ -21,7 +21,7 @@
           <h1>Nature<br>Nook.</h1>
         </a>
         <div class="nav-wrapper">
-          <a href="" class="link-underline">My trips</a>
+          <a href="{{ url_for('my_trips') }}" class="link-underline">My trips</a>
           <div class="account-dropdown">
             {% if user.is_authenticated %}
             <div class="account">{{ user.username[0].upper() if user.username else '*' }}</div>

@@ -21,7 +21,7 @@
           <h1>Nature<br>Nook.</h1>
         </a>
         <div class="nav-wrapper">
-          <a href="" class="link-underline">My trips</a>
+          <a href="{{ url_for('my_trips') }}" class="link-underline">My trips</a>
           <div class="account-dropdown">
             {% if user.is_authenticated %}
             <div class="account">{{ user.username[0].upper() if user.username else '*' }}</div>
@@ -38,7 +38,7 @@
     <main>
       <div class="main-content-wrapper create-main-content-wrapper">
 
-        <a href="/"><img src="../static/img/back-arrow.png" alt="back arrow" class="icons" />Back to all
+        <a href="{{ url_for('my_trips') }}"><img src="../static/img/back-arrow.png" alt="back arrow" class="icons" />Back to all
           the trips</a>
         <h2>{{ output.trip_name }}</h2>
         <p id="location">Location: {{ output.location }}</p>
