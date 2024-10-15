@@ -81,7 +81,7 @@ class Trip(db.Model):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
    if request.method == 'POST':
-       username = request.form['username']
+       username = request.form['username'].lower()
        password = request.form['password']
        user = User.query.filter_by(username=username).first()
        if user and user.password == password:
@@ -104,7 +104,7 @@ def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        new_user = User(username=username, password=password)
+        new_user = User(username=username.lower(), password=password)
         db.session.add(new_user)
         db.session.commit()
         flash('Account created!', 'success')
@@ -223,9 +223,6 @@ def view_trip():
         db.session.commit()
         trip = new_trip
     
-    # Invoke the NPS tool separately with **only the location**
-    # park_response = nps_tool(location)
-    
     log.info(response["output"])
 
     # Render the response on the view-trip.html page
@@ -308,20 +305,20 @@ def download_pdf():
     buffer.seek(0)
     return send_file(buffer, as_attachment=True, download_name="itinerary.pdf", mimetype='application/pdf')
 
-# Route to delete trip if the belongs to the logged in user
+# Route to delete trip if the trip belongs to the logged in user
 @app.route("/delete_trip/<int:trip_id>", methods=["POST"])
 @login_required
 def delete_trip(trip_id):
    """Handles the deletion of a trip."""
    trip = Trip.query.get_or_404(trip_id)
    if trip.user_id != current_user.id:
-       flash("You do not have permission to delete this trip.", "danger")
+       flash('You do not have permission to delete this trip.', 'danger')
        return redirect(url_for('my_trips'))
    
    db.session.delete(trip)
    db.session.commit()
-   flash("Trip deleted successfully.", "success")
-   log.info("Trip deleted: %s", flash)
+   flash('Trip deleted successfully.', 'success')
+   log.info('Trip deleted: %s', flash)
    return redirect(url_for('my_trips'))
 
 # Define generate trip function
